@@ -1,19 +1,43 @@
 from langchain.chat_models import ChatOpenAI
 from langchain.prompts import ChatPromptTemplate
 from langchain.chains import LLMChain
+from langchain.callbacks.base import BaseCallbackHandler
 from dotenv import load_dotenv
+
 
 load_dotenv()
 
-# chat = ChatOpenAI(streaming=True)
-chat = ChatOpenAI(streaming=False) # If I change streaming=True to False, it doesn't matter because I'm trying to call my language model with the stream method and that is going to override streaming of False.
+class StreamingHandler(BaseCallbackHandler):
+    def on_llm_new_token(self, token, **kwargs):
+        # print(token)
+        pass
+
+# TEST CALLBACK HANDLER
+chat = ChatOpenAI(
+    streaming=True, # it should be True
+    callbacks = [StreamingHandler()]
+)
 
 prompt = ChatPromptTemplate.from_messages([
-    ('human', '{content}')
+    ("human", "{content}")
 ])
+chain = LLMChain(llm=chat, prompt=prompt)
+
+for output in chain.stream(input={"content":"tell me a joke" }):
+    print(output)
+
+
+
+# TEST CHAIN AND CHAT
+# chat = ChatOpenAI(streaming=True)
+# chat = ChatOpenAI(streaming=False) # If I change streaming=True to False, it doesn't matter because I'm trying to call my language model with the stream method and that is going to override streaming of False.
+
+# prompt = ChatPromptTemplate.from_messages([
+#     ('human', '{content}')
+# ])
 
 # TEST CHAIN OUTPUT
-chain = LLMChain(llm = chat, prompt = prompt)
+# chain = LLMChain(llm = chat, prompt = prompt)
 
 # subtest 1
 # output = chain('tell me a joke')
