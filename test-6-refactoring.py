@@ -18,9 +18,7 @@ class StreamingHandler(BaseCallbackHandler):
     def on_llm_error(self, error, **kwargs):
         self.queue.put(None)
 
-chat = ChatOpenAI(
-    streaming=True, # it should be True
-)
+chat = ChatOpenAI(streaming=True)
 
 prompt = ChatPromptTemplate.from_messages([
     ("human", "{content}")
